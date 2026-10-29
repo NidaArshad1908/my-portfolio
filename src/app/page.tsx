@@ -1,10 +1,19 @@
 /* eslint-disable react/no-unescaped-entities */
 "use client";
 
-import React, { useState, useEffect } from 'react';
-import { Menu, X, Github, Linkedin, Mail, ExternalLink, Download, Code, Palette, Globe, Server, Database, Smartphone, ArrowRight, Star, Zap, Target, Users, Heart } from 'lucide-react';
+import React, { useState, useEffect, useRef } from 'react';
+import { Menu, X, Github, Linkedin, Mail, ExternalLink, Download, Code, Globe, Server, Database, Smartphone, ArrowRight, Star, Zap, Target, Users, Heart, Shield } from 'lucide-react';
 import Image from 'next/image';
-import emailjs from 'emailjs-com';
+import emailjs from '@emailjs/browser';
+
+const PARTICLES = [
+  { left: 8, top: 18 },
+  { left: 22, top: 72 },
+  { left: 41, top: 12 },
+  { left: 63, top: 81 },
+  { left: 78, top: 28 },
+  { left: 91, top: 58 },
+];
 
 const Portfolio = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -13,6 +22,8 @@ const Portfolio = () => {
   const [, setScrollY] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
   const [message, setMessage] = useState('');
+
+  const formRef = useRef<HTMLFormElement>(null);
 
   const [formData, setFormData] = useState({
     fullName: '',
@@ -67,6 +78,7 @@ const Portfolio = () => {
         to_email: 'nidaarshad113@gmail.com'
       };
 
+      // Make sure your Service ID, Template ID, and Public Key are correct in your EmailJS dashboard
       await emailjs.send(
         'service_2ilmxw6',
         'template_0tujakj',
@@ -76,9 +88,13 @@ const Portfolio = () => {
 
       setMessage('Message sent successfully! I will get back to you soon.');
       setFormData({ fullName: '', email: '', projectDetails: '' });
-    } catch (error) {
-      console.error('Error sending message:', error);
-      setMessage('Failed to send message. Please try again.');
+
+      if (formRef.current) formRef.current.reset();
+    } catch (error: any) {
+      console.error('EmailJS Error Details:', error);
+      // Extract specific error message from EmailJS if available
+      const errorMsg = error?.text || error?.message || 'Failed to send message. Please check console for details.';
+      setMessage(`Error: ${errorMsg}`);
     } finally {
       setIsLoading(false);
     }
@@ -112,89 +128,124 @@ const Portfolio = () => {
   }, []);
 
   const handleDownload = () => {
-    const pdfUrl = '/downloads/Resume-Nida-Arshad.pdf';
-
+    const pdfUrl = '/downloads/Nida_Arshad_CV_Fortex.pdf';
     const link = document.createElement('a');
     link.href = pdfUrl;
-    link.download = 'Resume-Nida-Arshad.pdf';
+    link.download = 'Nida_Arshad_CV_Fortex.pdf';
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
   };
 
   const handleScheduleCall = () => {
-    setIsLoading(true);
     window.open('https://calendly.com/nidaarshad113/30min', '_blank');
-    setIsLoading(false);
   };
 
   const personalInfo = {
-    name: "Nida Arshad Ch",
-    title: "Creative Full Stack Developer",
+    name: "Nida Arshad Chaudhry",
+    title: "Senior Full Stack Software Engineer",
     email: "nidaarshad113@gmail.com",
-    phone: "+92-XXX-XXXXXXX",
+    phone: "+92-328-4828987",
     location: "Lahore, Pakistan",
-    bio: "I craft digital experiences that blend creativity with cutting-edge technology. Passionate about building the future, one line of code at a time."
+    bio: "Full Stack Software Engineer with 3+ years of experience building scalable web and mobile applications using Next.js, NestJS, React.js, and React Native. Delivered 6+ major projects spanning SaaS, e-commerce, and enterprise systems."
   };
 
   const skills = [
-    { name: "JavaScript/TypeScript", level: 95, icon: <Code className="w-5 h-5" />, color: "from-yellow-400 to-orange-500" },
-    { name: "React/Next.js", level: 92, icon: <Globe className="w-5 h-5" />, color: "from-blue-400 to-cyan-500" },
-    { name: "Node.js/Express", level: 88, icon: <Server className="w-5 h-5" />, color: "from-green-400 to-emerald-500" },
-    { name: "MongoDB/PostgreSQL", level: 85, icon: <Database className="w-5 h-5" />, color: "from-purple-400 to-pink-500" },
-    { name: "UI/UX Design", level: 82, icon: <Palette className="w-5 h-5" />, color: "from-pink-400 to-rose-500" },
-    { name: "React Native", level: 78, icon: <Smartphone className="w-5 h-5" />, color: "from-indigo-400 to-purple-500" }
+    { name: "React.js / Next.js", level: 95, icon: <Globe className="w-5 h-5" />, color: "from-amber-400 to-yellow-600" },
+    { name: "NestJS / Node.js", level: 90, icon: <Server className="w-5 h-5" />, color: "from-emerald-400 to-teal-600" },
+    { name: "React Native", level: 85, icon: <Smartphone className="w-5 h-5" />, color: "from-rose-400 to-orange-500" },
+    { name: "PostgreSQL / TypeORM", level: 88, icon: <Database className="w-5 h-5" />, color: "from-sky-400 to-indigo-500" },
+    { name: "TypeScript / JavaScript", level: 92, icon: <Code className="w-5 h-5" />, color: "from-amber-300 to-orange-500" },
+    { name: "Cybersecurity Basics", level: 75, icon: <Shield className="w-5 h-5" />, color: "from-stone-400 to-amber-700" }
   ];
 
   const projects = [
     {
       id: 1,
-      title: "Ipsum Live Asset Handler",
-      description: "Next-gen shopping platform with AI recommendations and real-time analytics",
-      image: "/images/ipsum-logo.png",
-      tech: ["React Native", "Flutter", "Java", "PostgreSQL"],
-      github: "#",
-      live: "#",
+      title: "Order Me — Restaurant SaaS",
+      description: "Multi-tenant SaaS platform featuring QR ordering, POS, Kitchen Display Systems (KDS), and inventory management.",
+      image: "/images/Order-Me.png",
+      imageFit: "contain" as const,
+      tech: ["NestJS", "Next.js", "PostgreSQL", "Docker", "TypeORM"],
+      github: "https://github.com/abdullaharshad099/OrderMe",
+      live: "https://order-me-omega.vercel.app/login",
       featured: true,
-      stats: { users: "10K+", performance: "98%", growth: "+240%" }
+      stats: { roles: "4 Roles", modules: "20+", apis: "80+" }
     },
     {
       id: 2,
-      title: "GodWit",
-      description: "Real-time collaboration platform with advanced project management",
-      image: "/images/godwitLogoBottom.png",
-      tech: ["Next.JS", "GraphQL", "Node.js", "MongoDB", "SQL"],
+      title: "Live with Quran",
+      description: "Cross-platform mobile app for Ruku-based Qur'an learning, successfully launched on App Store and Google Play Store.",
+      image: "/images/IshmaalQuran-Logo.jpg", // Ensure this file exists in your public/images folder
+      imageFit: "cover" as const, // Changed to cover to fit the image properly
+      tech: ["React Native", "NestJS", "PostgreSQL", "Next.js"],
+      github: "#",
+      live: "https://lwq.nighathashmi.com/login",
+      featured: true,
+      stats: { platforms: "iOS & Android", features: "Video/Audio", admin: "Next.js" }
+    },
+    {
+      id: 3,
+      title: "Hide Design",
+      description: "Premium B2B outerwear platform serving as a digital catalogue, client inquiry system, and admin dashboard.",
+      image: "/images/HideDeign.png",
+      imageFit: "contain" as const,
+      tech: ["Next.js 14", "NestJS", "PostgreSQL", "Cloudinary"],
+      github: "#",
+      live: "https://www.hidesdesign.com",
+      featured: false,
+      stats: { seo: "JSON-LD", crud: "Full", auth: "JWT" }
+    },
+    {
+      id: 4,
+      title: "Ipsum",
+      description: "Mobile UI development with a focus on performance and seamless API integration.",
+      image: "/images/ipsum-logo.png",
+      imageFit: "contain" as const,
+      tech: ["React Native CLI", "API Integration"],
+      github: "#",
+      live: "https://dev.ipsum-live.ipsum.co.uk/login",
+      featured: false,
+      stats: { type: "Mobile", focus: "UI/UX" }
+    },
+    {
+      id: 5,
+      title: "Tailor Application",
+      description: "Full-stack application with authentication and CRUD functionality for tailoring businesses.",
+      image: "",
+      imageFit: "contain" as const,
+      tech: ["Next.js", "NestJS", "Authentication"],
       github: "#",
       live: "#",
-      featured: true,
-      stats: { users: "5K+", performance: "99%", growth: "+180%" }
+      featured: false,
+      stats: { type: "Web App", backend: "NestJS" }
+    },
+    {
+      id: 6,
+      title: "Godwit (Hospital Management)",
+      description: "Hospital management system with role-based modules and secure authentication.",
+      image: "/images/godwitLogoBottom.png",
+      imageFit: "contain" as const,
+      tech: ["Next.js", "NestJS", "Role-Based Auth"],
+      github: "#",
+      live: "#",
+      featured: false,
+      stats: { type: "Enterprise", modules: "Multi-role" }
     },
   ];
 
   const experiences = [
     {
-      company: "TechVision Labs",
-      position: "Lead Full Stack Developer",
-      period: "2025 - Present",
-      description: "Leading a team of 8 developers, architecting scalable solutions for enterprise clients",
-      achievements: ["Increased team productivity by 40%", "Built 3 major platforms", "Mentored 12+ developers"],
-      color: "from-blue-500 to-purple-600"
-    },
-    {
-      company: "Innovation Studios",
-      position: "Senior Frontend Developer",
-      period: "2024 - 2025",
-      description: "Specialized in creating immersive user experiences and complex interactive applications",
-      achievements: ["Led UI/UX transformation", "Reduced load times by 60%", "Implemented PWA features"],
-      color: "from-green-500 to-blue-500"
-    },
-    {
-      company: "StartUp Hub",
-      position: "Full Stack Developer",
-      period: "2023 - 2024",
-      description: "Built MVP products and scaled them to thousands of users",
-      achievements: ["Launched successful products", "Gained 50K+ users", "Implemented CI/CD"],
-      color: "from-purple-500 to-pink-500"
+      company: "Fortex Solutions",
+      position: "Senior Software Engineer",
+      period: "April 2023 - Present",
+      description: "Leading full-stack and mobile projects spanning SaaS platforms, content platforms, B2B e-commerce, and enterprise systems.",
+      achievements: [
+        "Delivered 6 major full-stack and mobile projects",
+        "Launched a Qur'an learning app on both App Store and Google Play",
+        "Architected multi-tenant SaaS (Order Me) serving 4 distinct roles",
+        "Managed complete development lifecycle from frontend to database design"
+      ]
     }
   ];
 
@@ -203,53 +254,71 @@ const Portfolio = () => {
     setIsMenuOpen(false);
   };
 
-  const FloatingElements = () => (
-    <div className="fixed inset-0 pointer-events-none overflow-hidden">
-      {[...Array(6)].map((_, i) => (
-        <div
-          key={i}
-          className="absolute w-2 h-2 bg-gradient-to-r from-blue-400 to-purple-500 rounded-full opacity-20 animate-pulse"
-          style={{
-            left: `${Math.random() * 100}%`,
-            top: `${Math.random() * 100}%`,
-            animationDelay: `${i * 0.5}s`,
-            transform: `translate(${mousePosition.x * 0.01 * (i + 1)}px, ${mousePosition.y * 0.01 * (i + 1)}px)`
-          }}
-        />
-      ))}
-    </div>
-  );
+  const ProjectImage = ({ project, className }: { project: typeof projects[number]; className: string }) => {
+    if (!project.image) {
+      return (
+        <div className={`flex h-full w-full items-center justify-center bg-gradient-to-br from-zinc-900 via-stone-900 to-black ${className}`}>
+          <span className="text-4xl font-semibold tracking-[0.2em] text-amber-200/80">
+            {project.title.slice(0, 2).toUpperCase()}
+          </span>
+        </div>
+      );
+    }
+
+    return (
+      <Image
+        src={project.image}
+        alt={project.title}
+        fill
+        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+        className={`${project.imageFit === 'contain' ? 'object-contain p-8' : 'object-cover'} ${className}`}
+      />
+    );
+  };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white relative overflow-x-hidden">
-      <FloatingElements />
+    <div className="relative min-h-screen overflow-x-hidden bg-[#07080c] text-[#f4efe6]">
+      <div className="pointer-events-none fixed inset-0 overflow-hidden">
+        {PARTICLES.map((particle, i) => (
+          <div
+            key={i}
+            className="absolute h-1.5 w-1.5 rounded-full bg-amber-200/40"
+            style={{
+              left: `${particle.left}%`,
+              top: `${particle.top}%`,
+              animationDelay: `${i * 0.5}s`,
+              transform: `translate(${mousePosition.x * 0.01 * (i + 1)}px, ${mousePosition.y * 0.01 * (i + 1)}px)`
+            }}
+          />
+        ))}
+      </div>
 
       <div
-        className="fixed w-6 h-6 pointer-events-none z-50 mix-blend-difference"
+        className="pointer-events-none fixed z-50 hidden h-8 w-8 mix-blend-screen md:block"
         style={{
-          left: mousePosition.x - 12,
-          top: mousePosition.y - 12,
-          background: 'radial-gradient(circle, rgba(59, 130, 246, 0.8) 0%, transparent 70%)',
+          left: mousePosition.x - 16,
+          top: mousePosition.y - 16,
+          background: 'radial-gradient(circle, rgba(212, 180, 131, 0.45) 0%, transparent 70%)',
           borderRadius: '50%',
-          transition: 'all 0.1s ease-out'
+          transition: 'all 0.15s ease-out'
         }}
       />
 
-      <nav className="fixed top-0 w-full bg-white/10 backdrop-blur-xl border-b border-white/10 z-40">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center py-4">
-            <div className="text-2xl font-bold bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">
-              {personalInfo.name}
+      <nav className="fixed top-0 z-40 w-full border-b border-white/8 bg-[#07080c]/70 backdrop-blur-2xl">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between py-4">
+            <div className="text-lg font-semibold tracking-[0.18em] text-amber-200 uppercase">
+              NAC
             </div>
 
-            <div className="hidden md:flex space-x-1">
+            <div className="hidden space-x-1 md:flex">
               {['Home', 'About', 'Skills', 'Projects', 'Experience', 'Contact'].map((item) => (
                 <button
                   key={item}
                   onClick={() => scrollTo(item.toLowerCase())}
-                  className={`px-4 py-2 rounded-xl text-sm font-medium transition-all duration-300 hover:scale-105 ${activeSection === item.toLowerCase()
-                    ? 'bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-lg shadow-blue-500/25'
-                    : 'text-gray-300 hover:text-white hover:bg-white/10'
+                  className={`rounded-full px-4 py-2 text-sm font-medium tracking-wide transition-all duration-300 ${activeSection === item.toLowerCase()
+                    ? 'bg-amber-200 text-stone-900 shadow-[0_0_24px_rgba(212,180,131,0.25)]'
+                    : 'text-stone-300 hover:bg-white/5 hover:text-amber-100'
                     }`}
                 >
                   {item}
@@ -258,22 +327,22 @@ const Portfolio = () => {
             </div>
 
             <button
-              className="md:hidden p-2 rounded-lg bg-white/10 backdrop-blur-sm hover:bg-white/20 transition-colors"
+              className="rounded-full border border-white/10 bg-white/5 p-2 transition-colors hover:bg-white/10 md:hidden"
               onClick={() => setIsMenuOpen(!isMenuOpen)}
             >
-              {isMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+              {isMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
             </button>
           </div>
         </div>
 
         {isMenuOpen && (
-          <div className="md:hidden bg-black/50 backdrop-blur-xl border-t border-white/10">
-            <div className="px-4 py-4 space-y-2">
+          <div className="border-t border-white/10 bg-[#07080c]/95 backdrop-blur-xl md:hidden">
+            <div className="space-y-1 px-4 py-4">
               {['Home', 'About', 'Skills', 'Projects', 'Experience', 'Contact'].map((item) => (
                 <button
                   key={item}
                   onClick={() => scrollTo(item.toLowerCase())}
-                  className="block w-full text-left px-4 py-3 text-gray-300 hover:text-white hover:bg-white/10 rounded-lg transition-colors"
+                  className="block w-full rounded-xl px-4 py-3 text-left text-stone-300 transition-colors hover:bg-white/5 hover:text-amber-100"
                 >
                   {item}
                 </button>
@@ -283,123 +352,133 @@ const Portfolio = () => {
         )}
       </nav>
 
-      <section id="home" className="relative min-h-screen flex items-center justify-center overflow-hidden">
+      <section id="home" className="relative flex min-h-screen items-center justify-center overflow-hidden">
         <div className="absolute inset-0">
-          <div className="absolute inset-0 bg-gradient-to-r from-blue-600/20 to-purple-600/20 animate-pulse"></div>
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_rgba(212,180,131,0.12),_transparent_55%)]" />
           <div
-            className="absolute inset-0 opacity-30"
+            className="absolute inset-0 opacity-40"
             style={{
-              background: `radial-gradient(circle at ${mousePosition.x}px ${mousePosition.y}px, rgba(59, 130, 246, 0.1) 0%, transparent 50%)`
+              background: `radial-gradient(circle at ${mousePosition.x}px ${mousePosition.y}px, rgba(212, 180, 131, 0.12) 0%, transparent 42%)`
             }}
-          ></div>
+          />
         </div>
 
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <div className="mb-8">
+        <div className="relative mx-auto max-w-7xl px-4 text-center sm:px-6 lg:px-8">
+          <div className="mb-10">
             <div className="relative inline-block">
-              <div className="w-40 h-40 mx-auto bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 rounded-full flex items-center justify-center text-white text-5xl font-bold animate-pulse shadow-2xl shadow-blue-500/25">
-                {personalInfo.name.split(' ').map(name => name[0]).join('')}
+              {/* Fixed Profile Image Container */}
+              <div className="relative mx-auto flex h-36 w-36 items-center justify-center overflow-hidden rounded-full border border-amber-200/30 shadow-[0_0_60px_rgba(212,180,131,0.18)]">
+                <Image
+                  src="/images/Me.jpg"
+                  alt="Nida Arshad"
+                  fill
+                  sizes="144px"
+                  className="object-cover object-top"
+                />
               </div>
-              <div className="absolute -inset-4 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full blur-xl opacity-30 animate-pulse"></div>
             </div>
           </div>
 
-          <div className="space-y-6">
-            <h1 className="text-5xl md:text-7xl font-bold bg-gradient-to-r from-white via-blue-200 to-purple-200 bg-clip-text text-transparent leading-tight">
+          <p className="mb-4 text-xs font-medium uppercase tracking-[0.35em] text-amber-200/80">
+            Portfolio
+          </p>
+          <div className="space-y-5">
+            <h1 className="text-5xl font-semibold leading-tight tracking-tight text-stone-50 md:text-7xl">
               {personalInfo.name}
             </h1>
-            <h2 className="text-2xl md:text-3xl text-blue-300 font-light">
+            <h2 className="text-xl font-light tracking-wide text-amber-100/90 md:text-2xl">
               {personalInfo.title}
             </h2>
-            <p className="text-lg md:text-xl text-gray-300 max-w-3xl mx-auto leading-relaxed">
+            <p className="mx-auto max-w-3xl text-base leading-relaxed text-stone-400 md:text-lg">
               {personalInfo.bio}
             </p>
           </div>
 
-          <div className="flex flex-col sm:flex-row gap-6 justify-center mt-12">
+          <div className="mt-12 flex flex-col justify-center gap-4 sm:flex-row">
             <button
               onClick={() => scrollTo('projects')}
-              className="group px-8 py-4 bg-gradient-to-r from-blue-600 to-purple-600 rounded-xl font-medium hover:shadow-2xl hover:shadow-blue-500/25 transition-all duration-300 hover:scale-105 flex items-center justify-center"
+              className="group flex items-center justify-center rounded-full bg-amber-200 px-8 py-3.5 font-medium text-stone-900 transition-all duration-300 hover:bg-amber-100 hover:shadow-[0_0_32px_rgba(212,180,131,0.35)]"
             >
               View My Work
-              <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
+              <ArrowRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
             </button>
             <button
               onClick={() => scrollTo('contact')}
-              className="px-8 py-4 border border-blue-500/50 rounded-xl font-medium hover:bg-blue-500/10 transition-all duration-300 hover:scale-105 backdrop-blur-sm"
+              className="rounded-full border border-amber-200/30 px-8 py-3.5 font-medium text-amber-100 transition-all duration-300 hover:border-amber-200/60 hover:bg-amber-200/5"
             >
               Let's Connect
             </button>
           </div>
 
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mt-16">
+          <div className="mt-16 grid grid-cols-2 gap-4 md:grid-cols-4">
             {[
-              { number: "10+", label: "Projects Completed" },
+              { number: "6+", label: "Projects Delivered" },
               { number: "3+", label: "Years Experience" },
-              { number: "100K+", label: "Lines of Code" },
-              { number: "98%", label: "Client Satisfaction" }
+              { number: "80+", label: "APIs Built" },
+              { number: "100%", label: "Client Satisfaction" }
             ].map((stat, index) => (
-              <div key={index} className="p-6 bg-white/5 backdrop-blur-sm rounded-xl border border-white/10 hover:bg-white/10 transition-all duration-300">
-                <div className="text-3xl font-bold text-blue-400">{stat.number}</div>
-                <div className="text-sm text-gray-400">{stat.label}</div>
+              <div key={index} className="rounded-2xl border border-white/8 bg-white/[0.03] p-6 backdrop-blur-sm">
+                <div className="text-3xl font-semibold text-amber-200">{stat.number}</div>
+                <div className="mt-1 text-sm text-stone-500">{stat.label}</div>
               </div>
             ))}
           </div>
         </div>
 
-        <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 animate-bounce">
-          <div className="w-6 h-10 border-2 border-blue-400 rounded-full flex justify-center">
-            <div className="w-1 h-3 bg-blue-400 rounded-full mt-2 animate-pulse"></div>
+        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 animate-bounce">
+          <div className="flex h-10 w-6 justify-center rounded-full border border-amber-200/40">
+            <div className="mt-2 h-3 w-1 rounded-full bg-amber-200/80"></div>
           </div>
         </div>
       </section>
 
-      <section id="about" className="py-20 relative">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent mb-4">
+      <section id="about" className="relative py-24">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="mb-16 text-center">
+            <h2 className="mb-4 text-4xl font-semibold tracking-tight text-stone-50 md:text-5xl">
               About Me
             </h2>
-            <div className="w-24 h-1 bg-gradient-to-r from-blue-500 to-purple-600 mx-auto rounded-full"></div>
+            <div className="mx-auto h-px w-16 bg-amber-200/70"></div>
           </div>
 
-          <div className="grid lg:grid-cols-2 gap-16 items-center">
+          <div className="grid items-center gap-16 lg:grid-cols-2">
             <div className="space-y-8">
-              <h3 className="text-3xl font-bold text-white mb-6">
-                Crafting Digital Excellence from Pakistan 🇵🇰
+              <h3 className="text-3xl font-medium text-stone-100">
+                Crafting digital excellence from Pakistan
               </h3>
-              <p className="text-gray-300 text-lg leading-relaxed">
-                Based in the vibrant city of {personalInfo.location}, I'm a passionate developer who believes
-                in the power of technology to transform ideas into reality. With over 3 years of experience,
-                I've worked with startups to enterprises, creating solutions that matter.
+              <p className="text-lg leading-relaxed text-stone-400">
+                Based in {personalInfo.location}, I'm a passionate Full Stack Software Engineer who believes
+                in the power of technology to transform ideas into reality. As a Senior Software Engineer at Fortex Solutions,
+                I have led and delivered six full-stack and mobile projects spanning SaaS platforms, content platforms,
+                B2B e-commerce, and enterprise systems.
               </p>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                 {[
-                  { icon: <Mail className="w-5 h-5" />, label: "Email", value: personalInfo.email },
-                  { icon: <Globe className="w-5 h-5" />, label: "Location", value: personalInfo.location },
-                  { icon: <Zap className="w-5 h-5" />, label: "Experience", value: "3+ Years" },
-                  { icon: <Target className="w-5 h-5" />, label: "Focus", value: "Full Stack" }
+                  { icon: <Mail className="h-5 w-5" />, label: "Email", value: personalInfo.email },
+                  { icon: <Globe className="h-5 w-5" />, label: "Location", value: personalInfo.location },
+                  { icon: <Zap className="h-5 w-5" />, label: "Experience", value: "3+ Years" },
+                  { icon: <Target className="h-5 w-5" />, label: "Focus", value: "Full Stack & Mobile" }
                 ].map((item, index) => (
-                  <div key={index} className="flex items-start space-x-4 p-4 bg-white/5 backdrop-blur-sm rounded-xl border border-white/10 hover:bg-white/10 transition-all duration-300">
-                    <div className="text-blue-400 mt-1">{item.icon}</div>
+                  <div key={index} className="flex items-start space-x-4 rounded-2xl border border-white/8 bg-white/[0.03] p-4">
+                    <div className="mt-1 text-amber-200">{item.icon}</div>
                     <div>
-                      <div className="font-semibold text-white">{item.label}</div>
-                      <div className="text-gray-400 text-sm">{item.value}</div>
+                      <div className="font-medium text-stone-100">{item.label}</div>
+                      <div className="text-sm text-stone-500">{item.value}</div>
                     </div>
                   </div>
                 ))}
               </div>
 
-              <div className="flex space-x-4">
+              <div className="flex flex-wrap gap-4">
                 <button
                   onClick={handleDownload}
-                  className="px-6 py-3 bg-gradient-to-r from-blue-600 to-purple-600 rounded-xl hover:shadow-xl transition-all duration-300 flex items-center text-white"
+                  className="flex items-center rounded-full bg-amber-200 px-6 py-3 font-medium text-stone-900 transition-all hover:bg-amber-100"
                 >
-                  <Download className="w-4 h-4 mr-2" />
+                  <Download className="mr-2 h-4 w-4" />
                   Download CV
                 </button>
-                <button className="px-6 py-3 border border-blue-500/50 rounded-xl hover:bg-blue-500/10 transition-all duration-300">
+                <button onClick={() => scrollTo('projects')} className="rounded-full border border-amber-200/30 px-6 py-3 text-amber-100 transition-all hover:bg-amber-200/5">
                   View Portfolio
                 </button>
               </div>
@@ -407,43 +486,49 @@ const Portfolio = () => {
 
             <div className="relative">
               <div className="relative z-10">
-                <div className="w-80 h-80 mx-auto bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 rounded-3xl flex items-center justify-center text-white text-8xl font-bold shadow-2xl">
-                  {personalInfo.name.split(' ').map(name => name[0]).join('')}
+                {/* Fixed About Section Image Container */}
+                <div className="relative mx-auto flex h-[450px] w-full max-w-sm items-center justify-center overflow-hidden rounded-[2rem] border border-amber-200/20 shadow-[0_0_80px_rgba(212,180,131,0.12)]">
+                  <Image
+                    src="/images/Me.jpg"
+                    alt="Nida Arshad Profile"
+                    fill
+                    sizes="(max-width: 768px) 100vw, 400px"
+                    className="object-cover object-center"
+                  />
                 </div>
               </div>
-              <div className="absolute inset-0 bg-gradient-to-r from-blue-500 to-purple-600 rounded-3xl blur-3xl opacity-30 scale-110"></div>
             </div>
           </div>
         </div>
       </section>
 
-      <section id="skills" className="py-20 relative">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent mb-4">
+      <section id="skills" className="relative py-24">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="mb-16 text-center">
+            <h2 className="mb-4 text-4xl font-semibold tracking-tight text-stone-50 md:text-5xl">
               Technical Arsenal
             </h2>
-            <div className="w-24 h-1 bg-gradient-to-r from-blue-500 to-purple-600 mx-auto rounded-full"></div>
+            <div className="mx-auto h-px w-16 bg-amber-200/70"></div>
           </div>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
             {skills.map((skill, index) => (
-              <div key={index} className="group p-8 bg-white/5 backdrop-blur-sm rounded-2xl border border-white/10 hover:bg-white/10 transition-all duration-500 hover:scale-105 hover:shadow-2xl">
-                <div className="flex items-center mb-6">
-                  <div className={`p-3 rounded-xl bg-gradient-to-r ${skill.color} mr-4 group-hover:scale-110 transition-transform`}>
+              <div key={index} className="group rounded-3xl border border-white/8 bg-white/[0.03] p-8 transition-all duration-500 hover:border-amber-200/20 hover:bg-white/[0.05]">
+                <div className="mb-6 flex items-center">
+                  <div className={`mr-4 rounded-2xl bg-gradient-to-r ${skill.color} p-3 text-stone-900`}>
                     {skill.icon}
                   </div>
-                  <h3 className="text-xl font-bold text-white">{skill.name}</h3>
+                  <h3 className="text-lg font-semibold text-stone-100">{skill.name}</h3>
                 </div>
 
                 <div className="space-y-3">
-                  <div className="flex justify-between items-center">
-                    <span className="text-gray-400">Proficiency</span>
-                    <span className="text-blue-400 font-bold">{skill.level}%</span>
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm text-stone-500">Proficiency</span>
+                    <span className="font-semibold text-amber-200">{skill.level}%</span>
                   </div>
-                  <div className="w-full bg-gray-800 rounded-full h-3 overflow-hidden">
+                  <div className="h-1.5 w-full overflow-hidden rounded-full bg-white/10">
                     <div
-                      className={`h-3 rounded-full bg-gradient-to-r ${skill.color} transition-all duration-1000 ease-out`}
+                      className={`h-1.5 rounded-full bg-gradient-to-r ${skill.color}`}
                       style={{ width: `${skill.level}%` }}
                     ></div>
                   </div>
@@ -454,60 +539,54 @@ const Portfolio = () => {
         </div>
       </section>
 
-      <section id="projects" className="py-20 relative">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent mb-4">
+      <section id="projects" className="relative py-24">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="mb-16 text-center">
+            <h2 className="mb-4 text-4xl font-semibold tracking-tight text-stone-50 md:text-5xl">
               Featured Projects
             </h2>
-            <div className="w-24 h-1 bg-gradient-to-r from-blue-500 to-purple-600 mx-auto rounded-full"></div>
+            <div className="mx-auto h-px w-16 bg-amber-200/70"></div>
           </div>
 
-          <div className="grid lg:grid-cols-2 gap-8 mb-12">
+          <div className="mb-10 grid gap-8 lg:grid-cols-2">
             {projects.filter(p => p.featured).map((project) => (
-              <div key={project.id} className="group relative overflow-hidden rounded-2xl bg-white/5 backdrop-blur-sm border border-white/10 hover:bg-white/10 transition-all duration-500 hover:scale-[1.02] hover:shadow-2xl">
-                <div className="relative h-64 overflow-hidden">
-                  <Image
-                    src={project.image}
-                    alt={project.title}
-                    fill
-                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                    className="object-cover group-hover:scale-110 transition-transform duration-700"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
-                  <div className="absolute top-4 right-4">
-                    <span className="px-3 py-1 bg-blue-500 text-xs font-bold rounded-full">FEATURED</span>
+              <div key={project.id} className="group relative overflow-hidden rounded-3xl border border-white/8 bg-white/[0.03] transition-all duration-500 hover:border-amber-200/20">
+                <div className="relative h-64 overflow-hidden bg-black">
+                  <ProjectImage project={project} className="transition-transform duration-700 group-hover:scale-105" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-[#07080c] via-transparent to-transparent"></div>
+                  <div className="absolute right-4 top-4">
+                    <span className="rounded-full bg-amber-200 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.16em] text-stone-900">Featured</span>
                   </div>
                 </div>
 
                 <div className="p-8">
-                  <h3 className="text-2xl font-bold text-white mb-3 group-hover:text-blue-400 transition-colors">{project.title}</h3>
-                  <p className="text-gray-300 mb-6 leading-relaxed">{project.description}</p>
+                  <h3 className="mb-3 text-2xl font-semibold text-stone-50 transition-colors group-hover:text-amber-200">{project.title}</h3>
+                  <p className="mb-6 leading-relaxed text-stone-400">{project.description}</p>
 
-                  <div className="flex flex-wrap gap-2 mb-6">
+                  <div className="mb-6 flex flex-wrap gap-2">
                     {project.tech.map((tech, index) => (
-                      <span key={index} className="px-3 py-1 bg-blue-500/20 border border-blue-500/30 text-blue-300 text-sm rounded-lg backdrop-blur-sm">
+                      <span key={index} className="rounded-full border border-amber-200/20 bg-amber-200/5 px-3 py-1 text-sm text-amber-100/90">
                         {tech}
                       </span>
                     ))}
                   </div>
 
-                  <div className="grid grid-cols-3 gap-4 mb-6">
+                  <div className="mb-6 grid grid-cols-3 gap-4">
                     {Object.entries(project.stats).map(([key, value]) => (
                       <div key={key} className="text-center">
-                        <div className="text-lg font-bold text-blue-400">{value}</div>
-                        <div className="text-xs text-gray-500 capitalize">{key}</div>
+                        <div className="text-lg font-semibold text-amber-200">{value}</div>
+                        <div className="text-xs capitalize text-stone-500">{key}</div>
                       </div>
                     ))}
                   </div>
 
-                  <div className="flex gap-4">
-                    <a href={project.github} className="flex-1 flex items-center justify-center px-4 py-3 bg-gray-800 hover:bg-gray-700 rounded-xl transition-colors group">
-                      <Github className="w-4 h-4 mr-2 group-hover:scale-110 transition-transform" />
+                  <div className="flex gap-3">
+                    <a href={project.github} className="flex flex-1 items-center justify-center rounded-full border border-white/10 bg-white/5 px-4 py-3 transition-colors hover:bg-white/10">
+                      <Github className="mr-2 h-4 w-4" />
                       Code
                     </a>
-                    <a href={project.live} className="flex-1 flex items-center justify-center px-4 py-3 bg-gradient-to-r from-blue-600 to-purple-600 hover:shadow-xl rounded-xl transition-all">
-                      <ExternalLink className="w-4 h-4 mr-2" />
+                    <a href={project.live} className="flex flex-1 items-center justify-center rounded-full bg-amber-200 px-4 py-3 font-medium text-stone-900 transition-all hover:bg-amber-100">
+                      <ExternalLink className="mr-2 h-4 w-4" />
                       Live Demo
                     </a>
                   </div>
@@ -516,39 +595,33 @@ const Portfolio = () => {
             ))}
           </div>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
             {projects.filter(p => !p.featured).map((project) => (
-              <div key={project.id} className="group relative overflow-hidden rounded-xl bg-white/5 backdrop-blur-sm border border-white/10 hover:bg-white/10 transition-all duration-300 hover:scale-105">
-                <div className="relative h-48 overflow-hidden">
-                  <Image
-                    src={project.image}
-                    alt={project.title}
-                    fill
-                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                    className="object-cover group-hover:scale-110 transition-transform duration-500"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
+              <div key={project.id} className="group relative overflow-hidden rounded-3xl border border-white/8 bg-white/[0.03] transition-all duration-300 hover:border-amber-200/20">
+                <div className="relative h-48 overflow-hidden bg-black">
+                  <ProjectImage project={project} className="transition-transform duration-500 group-hover:scale-105" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-[#07080c] via-transparent to-transparent"></div>
                 </div>
 
                 <div className="p-6">
-                  <h3 className="text-xl font-bold text-white mb-2">{project.title}</h3>
-                  <p className="text-gray-400 mb-4 text-sm">{project.description}</p>
+                  <h3 className="mb-2 text-xl font-semibold text-stone-50">{project.title}</h3>
+                  <p className="mb-4 text-sm text-stone-400">{project.description}</p>
 
-                  <div className="flex flex-wrap gap-1 mb-4">
+                  <div className="mb-4 flex flex-wrap gap-1">
                     {project.tech.slice(0, 3).map((tech, index) => (
-                      <span key={index} className="px-2 py-1 bg-blue-500/20 text-blue-300 text-xs rounded">
+                      <span key={index} className="rounded-full bg-amber-200/10 px-2 py-1 text-xs text-amber-100/90">
                         {tech}
                       </span>
                     ))}
                   </div>
 
-                  <div className="flex gap-3">
-                    <a href={project.github} className="flex items-center text-gray-400 hover:text-blue-400 transition-colors text-sm">
-                      <Github className="w-4 h-4 mr-1" />
+                  <div className="flex gap-4">
+                    <a href={project.github} className="flex items-center text-sm text-stone-500 transition-colors hover:text-amber-200">
+                      <Github className="mr-1 h-4 w-4" />
                       Code
                     </a>
-                    <a href={project.live} className="flex items-center text-gray-400 hover:text-blue-400 transition-colors text-sm">
-                      <ExternalLink className="w-4 h-4 mr-1" />
+                    <a href={project.live} className="flex items-center text-sm text-stone-500 transition-colors hover:text-amber-200">
+                      <ExternalLink className="mr-1 h-4 w-4" />
                       Demo
                     </a>
                   </div>
@@ -559,151 +632,147 @@ const Portfolio = () => {
         </div>
       </section>
 
-      <section id="experience" className="py-20 relative">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent mb-4">
+      <section id="experience" className="relative py-24">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="mb-16 text-center">
+            <h2 className="mb-4 text-4xl font-semibold tracking-tight text-stone-50 md:text-5xl">
               Career Journey
             </h2>
-            <div className="w-24 h-1 bg-gradient-to-r from-blue-500 to-purple-600 mx-auto rounded-full"></div>
+            <div className="mx-auto h-px w-16 bg-amber-200/70"></div>
           </div>
 
-          <div className="max-w-4xl mx-auto">
+          <div className="mx-auto max-w-4xl">
             {experiences.map((exp, index) => (
               <div key={index} className="relative mb-12 last:mb-0">
-                <div className="flex flex-col lg:flex-row gap-8 items-start">
-                  <div className="lg:w-1/3 flex-shrink-0">
-                    <div className={`p-6 rounded-2xl bg-gradient-to-r ${exp.color} shadow-xl`}>
-                      <div className="text-white font-bold text-lg">{exp.period}</div>
-                      <div className="text-white/90 text-sm">{exp.company}</div>
+                <div className="flex flex-col items-start gap-8 lg:flex-row">
+                  <div className="w-full flex-shrink-0 lg:w-1/3">
+                    <div className="rounded-2xl border border-amber-200/20 bg-gradient-to-br from-amber-200 to-yellow-600 p-6 text-stone-900 shadow-[0_0_40px_rgba(212,180,131,0.15)]">
+                      <div className="text-lg font-semibold">{exp.period}</div>
+                      <div className="text-sm opacity-80">{exp.company}</div>
                     </div>
                   </div>
 
-                  <div className="lg:w-2/3 bg-white/5 backdrop-blur-sm rounded-2xl border border-white/10 p-8 hover:bg-white/10 transition-all duration-300">
-                    <h3 className="text-2xl font-bold text-white mb-3">{exp.position}</h3>
-                    <p className="text-gray-300 mb-6 leading-relaxed">{exp.description}</p>
+                  <div className="w-full rounded-3xl border border-white/8 bg-white/[0.03] p-8 lg:w-2/3">
+                    <h3 className="mb-3 text-2xl font-semibold text-stone-50">{exp.position}</h3>
+                    <p className="mb-6 leading-relaxed text-stone-400">{exp.description}</p>
 
                     <div className="space-y-2">
-                      <h4 className="text-blue-400 font-semibold mb-3">Key Achievements:</h4>
+                      <h4 className="mb-3 font-medium text-amber-200">Key Achievements</h4>
                       {exp.achievements.map((achievement, i) => (
                         <div key={i} className="flex items-center space-x-3">
-                          <Star className="w-4 h-4 text-yellow-400 flex-shrink-0" />
-                          <span className="text-gray-300">{achievement}</span>
+                          <Star className="h-4 w-4 flex-shrink-0 text-amber-300" />
+                          <span className="text-stone-300">{achievement}</span>
                         </div>
                       ))}
                     </div>
                   </div>
                 </div>
-
-                {index < experiences.length - 1 && (
-                  <div className="hidden lg:block absolute left-[16.66%] top-32 w-px h-16 bg-gradient-to-b from-blue-500 to-purple-600"></div>
-                )}
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      <section id="contact" className="py-20 relative">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent mb-4">
+      <section id="contact" className="relative py-24">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="mb-16 text-center">
+            <h2 className="mb-4 text-4xl font-semibold tracking-tight text-stone-50 md:text-5xl">
               Let's Create Something Amazing
             </h2>
-            <div className="w-24 h-1 bg-gradient-to-r from-blue-500 to-purple-600 mx-auto rounded-full"></div>
+            <div className="mx-auto h-px w-16 bg-amber-200/70"></div>
           </div>
 
-          <div className="grid lg:grid-cols-2 gap-12">
+          <div className="grid gap-12 lg:grid-cols-2">
             <div className="space-y-8">
-              <h3 className="text-3xl font-bold text-white mb-6">
-                Ready to Build the Future?
+              <h3 className="text-3xl font-medium text-stone-100">
+                Ready to build the future?
               </h3>
-              <p className="text-gray-300 text-lg leading-relaxed">
+              <p className="text-lg leading-relaxed text-stone-400">
                 I'm always excited to work on new projects and collaborate with amazing people.
                 Whether you have a project in mind or just want to connect, I'd love to hear from you!
               </p>
 
-              <div className="space-y-6">
+              <div className="space-y-4">
                 {[
-                  { icon: <Mail className="w-6 h-6" />, label: "Email", value: personalInfo.email, href: `mailto:${personalInfo.email}` },
-                  { icon: <Github className="w-6 h-6" />, label: "GitHub", value: "github.com/NidaArshad1908", href: "https://github.com/NidaArshad1908" },
-                  { icon: <Linkedin className="w-6 h-6" />, label: "LinkedIn", value: "linkedin.com/in/nida-arshad-119071286", href: "https://www.linkedin.com/in/nida-arshad-119071286/" }
+                  { icon: <Mail className="h-6 w-6" />, label: "Email", value: personalInfo.email, href: `mailto:${personalInfo.email}` },
+                  { icon: <Github className="h-6 w-6" />, label: "GitHub", value: "github.com/NidaArshad1908", href: "https://github.com/NidaArshad1908" },
+                  { icon: <Linkedin className="h-6 w-6" />, label: "LinkedIn", value: "linkedin.com/in/nida-arshad-chaudhry-119071286", href: "https://www.linkedin.com/in/nida-arshad-chaudhry-119071286/" }
                 ].map((contact, index) => (
-                  <a key={index} href={contact.href} className="group flex items-center space-x-4 p-4 bg-white/5 backdrop-blur-sm rounded-xl border border-white/10 hover:bg-white/10 transition-all duration-300 hover:scale-105">
-                    <div className="text-blue-400 group-hover:scale-110 transition-transform">{contact.icon}</div>
+                  <a key={index} href={contact.href} className="group flex items-center space-x-4 rounded-2xl border border-white/8 bg-white/[0.03] p-4 transition-all duration-300 hover:border-amber-200/20">
+                    <div className="text-amber-200">{contact.icon}</div>
                     <div>
-                      <div className="font-semibold text-white">{contact.label}</div>
-                      <div className="text-gray-400">{contact.value}</div>
+                      <div className="font-medium text-stone-100">{contact.label}</div>
+                      <div className="text-stone-500">{contact.value}</div>
                     </div>
                   </a>
                 ))}
               </div>
 
-              <div className="flex space-x-4">
-                <button onClick={handleDownload} className="px-6 py-3 bg-gradient-to-r from-blue-600 to-purple-600 rounded-xl hover:shadow-xl transition-all duration-300 flex items-center">
-                  <Download className="w-4 h-4 mr-2" />
+              <div className="flex flex-wrap gap-4">
+                <button onClick={handleDownload} className="flex items-center rounded-full bg-amber-200 px-6 py-3 font-medium text-stone-900 transition-all hover:bg-amber-100">
+                  <Download className="mr-2 h-4 w-4" />
                   Download Resume
                 </button>
                 <button
                   onClick={handleScheduleCall}
                   disabled={isLoading}
-                  className="px-6 py-3 border border-blue-500/50 rounded-xl hover:bg-blue-500/10 transition-all duration-300 flex items-center"
+                  className="flex items-center rounded-full border border-amber-200/30 px-6 py-3 text-amber-100 transition-all hover:bg-amber-200/5"
                 >
-                  <Users className="w-4 h-4 mr-2" />
+                  <Users className="mr-2 h-4 w-4" />
                   {isLoading ? 'Loading...' : 'Schedule Call'}
                 </button>
               </div>
             </div>
 
-            <div className="bg-white/5 backdrop-blur-sm rounded-2xl border border-white/10 p-8 hover:bg-white/10 transition-all duration-300">
-              <form onSubmit={handleSubmit} className="space-y-6">
+            <div className="rounded-3xl border border-white/8 bg-white/[0.03] p-8">
+              <form ref={formRef} onSubmit={handleSubmit} className="space-y-6">
                 <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-3">
-                    Full Name <span className="text-red-400">*</span>
+                  <label className="mb-3 block text-sm font-medium text-stone-300">
+                    Full Name <span className="text-rose-400">*</span>
                   </label>
                   <input
                     type="text"
                     name="fullName"
                     value={formData.fullName}
                     onChange={handleInputChange}
-                    className="w-full px-4 py-4 bg-white/5 border border-white/20 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent text-white placeholder-gray-400 backdrop-blur-sm transition-all duration-300"
+                    className="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-4 text-stone-100 placeholder-stone-500 outline-none transition-all duration-300 focus:border-amber-200/40"
                     placeholder="Your Name"
                     required
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-3">
-                    Email Address <span className="text-red-400">*</span>
+                  <label className="mb-3 block text-sm font-medium text-stone-300">
+                    Email Address <span className="text-rose-400">*</span>
                   </label>
                   <input
                     type="email"
                     name="email"
                     value={formData.email}
                     onChange={handleInputChange}
-                    className="w-full px-4 py-4 bg-white/5 border border-white/20 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent text-white placeholder-gray-400 backdrop-blur-sm transition-all duration-300"
+                    className="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-4 text-stone-100 placeholder-stone-500 outline-none transition-all duration-300 focus:border-amber-200/40"
                     placeholder="your.email@gmail.com"
                     required
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-3">
-                    Project Details <span className="text-red-400">*</span>
+                  <label className="mb-3 block text-sm font-medium text-stone-300">
+                    Project Details <span className="text-rose-400">*</span>
                   </label>
                   <textarea
                     name="projectDetails"
                     value={formData.projectDetails}
                     onChange={handleInputChange}
                     rows={6}
-                    className="w-full px-4 py-4 bg-white/5 border border-white/20 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent text-white placeholder-gray-400 backdrop-blur-sm transition-all duration-300 resize-none"
+                    className="w-full resize-none rounded-2xl border border-white/10 bg-white/5 px-4 py-4 text-stone-100 placeholder-stone-500 outline-none transition-all duration-300 focus:border-amber-200/40"
                     placeholder="Tell me about your project ideas, requirements, or just say hello!"
                     required
                   ></textarea>
                 </div>
 
                 {message && (
-                  <div className={`p-3 rounded-lg text-center ${message.includes('successfully') ? 'bg-green-500/20 text-green-400' : 'bg-red-500/20 text-red-400'
+                  <div className={`rounded-xl p-3 text-center ${message.includes('successfully') ? 'bg-emerald-500/20 text-emerald-300' : 'bg-rose-500/20 text-rose-300'
                     }`}>
                     {message}
                   </div>
@@ -712,10 +781,10 @@ const Portfolio = () => {
                 <button
                   type="submit"
                   disabled={isLoading}
-                  className="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white py-4 px-6 rounded-xl font-medium hover:shadow-2xl hover:shadow-blue-500/25 transition-all duration-300 hover:scale-105 flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="flex w-full items-center justify-center rounded-full bg-amber-200 px-6 py-4 font-medium text-stone-900 transition-all duration-300 hover:bg-amber-100 disabled:cursor-not-allowed disabled:opacity-50"
                 >
                   {isLoading ? 'Sending...' : 'Send Message'}
-                  {!isLoading && <ArrowRight className="ml-2 w-5 h-5" />}
+                  {!isLoading && <ArrowRight className="ml-2 h-5 w-5" />}
                 </button>
               </form>
             </div>
@@ -723,39 +792,41 @@ const Portfolio = () => {
         </div>
       </section>
 
-      <footer className="py-12 bg-black/20 backdrop-blur-sm border-t border-white/10">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <footer className="border-t border-white/8 py-12">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="text-center">
             <div className="mb-6">
-              <h3 className="text-2xl font-bold bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent mb-2">
+              <h3 className="mb-2 text-2xl font-semibold tracking-tight text-amber-100">
                 {personalInfo.name}
               </h3>
-              <p className="text-gray-400">
+              <p className="text-stone-500">
                 Crafting digital experiences with passion and precision
               </p>
             </div>
 
-            <div className="flex justify-center space-x-6 mb-8">
+            <div className="mb-8 flex justify-center space-x-4">
               {[
-                { icon: <Github className="w-6 h-6" />, href: "https://github.com/NidaArshad1908", label: "GitHub" },
-                { icon: <Linkedin className="w-6 h-6" />, href: "https://www.linkedin.com/in/nida-arshad-119071286/", label: "LinkedIn" },
-                { icon: <Mail className="w-6 h-6" />, href: `mailto:${personalInfo.email}`, label: "Email" }
+                { icon: <Github className="h-5 w-5" />, href: "https://github.com/NidaArshad1908", label: "GitHub" },
+                {
+                  icon: <Linkedin className="h-5 w-5" />, href: "https://www.linkedin.com/in/nida-arshad-chaudhry-119071286", label: "LinkedIn"
+                },
+                { icon: <Mail className="h-5 w-5" />, href: `mailto:${personalInfo.email}`, label: "Email" }
               ].map((social, index) => (
                 <a
                   key={index}
                   href={social.href}
                   aria-label={social.label}
-                  className="p-3 bg-white/5 rounded-xl border border-white/10 hover:bg-white/10 transition-all duration-300 hover:scale-110 text-gray-400 hover:text-blue-400"
+                  className="rounded-full border border-white/10 bg-white/5 p-3 text-stone-400 transition-all duration-300 hover:border-amber-200/30 hover:text-amber-200"
                 >
                   {social.icon}
                 </a>
               ))}
             </div>
 
-            <div className="text-gray-500 text-sm flex items-center justify-center space-x-2">
-              <span>© 2025 {personalInfo.name}. Designed & Built with</span>
-              <Heart className="w-4 h-4 text-red-400 animate-pulse" />
-              <span>in Pakistan 🇵🇰</span>
+            <div className="flex items-center justify-center space-x-2 text-sm text-stone-600">
+              <span>© 2026 {personalInfo.name}. Designed & Built with</span>
+              <Heart className="h-4 w-4 text-rose-400" />
+              <span>in Pakistan</span>
             </div>
           </div>
         </div>
