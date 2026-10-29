@@ -92,13 +92,20 @@ const Portfolio = () => {
     } catch (error: unknown) {
       console.error('EmailJS Error Details:', error);
       let errorMsg = 'Failed to send message. Please check console for details.';
-      if (error && typeof error === 'object') {
-        if ('text' in error && typeof (error as any).text === 'string') {
-          errorMsg = (error as any).text;
-        } else if ('message' in error && typeof (error as any).message === 'string') {
-          errorMsg = (error as any).message;
+
+      if (error instanceof Error) {
+        errorMsg = error.message;
+      } else if (typeof error === 'object' && error !== null) {
+        const errObj = error as Record<string, unknown>;
+        if (typeof errObj.text === 'string') {
+          errorMsg = errObj.text;
+        } else if (typeof errObj.message === 'string') {
+          errorMsg = errObj.message;
         }
+      } else if (typeof error === 'string') {
+        errorMsg = error;
       }
+
       setMessage(`Error: ${errorMsg}`);
     } finally {
       setIsLoading(false);
