@@ -78,7 +78,6 @@ const Portfolio = () => {
         to_email: 'nidaarshad113@gmail.com'
       };
 
-      // Make sure your Service ID, Template ID, and Public Key are correct in your EmailJS dashboard
       await emailjs.send(
         'service_2ilmxw6',
         'template_0tujakj',
@@ -90,10 +89,16 @@ const Portfolio = () => {
       setFormData({ fullName: '', email: '', projectDetails: '' });
 
       if (formRef.current) formRef.current.reset();
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('EmailJS Error Details:', error);
-      // Extract specific error message from EmailJS if available
-      const errorMsg = error?.text || error?.message || 'Failed to send message. Please check console for details.';
+      let errorMsg = 'Failed to send message. Please check console for details.';
+      if (error && typeof error === 'object') {
+        if ('text' in error && typeof (error as any).text === 'string') {
+          errorMsg = (error as any).text;
+        } else if ('message' in error && typeof (error as any).message === 'string') {
+          errorMsg = (error as any).message;
+        }
+      }
       setMessage(`Error: ${errorMsg}`);
     } finally {
       setIsLoading(false);

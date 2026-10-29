@@ -10,9 +10,8 @@ const quicksand = Quicksand({
 });
 
 export const metadata: Metadata = {
-  title: "Nida Arshad Chaudhry — Full Stack Engineer",
-  description:
-    "Portfolio of Nida Arshad Chaudhry, Senior Full Stack Software Engineer specializing in Next.js, NestJS, and React Native.",
+  title: "Nida Arshad Chaudhry | Full Stack Developer",
+  description: "Portfolio of Nida Arshad Chaudhry, a Senior Full Stack Software Engineer specializing in Next.js, NestJS, and React Native.",
 };
 
 export default function RootLayout({
